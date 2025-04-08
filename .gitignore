@@ -1,0 +1,39 @@
+# Dados
+data/*
+!data/.gitkeep
+raw_data/*
+!raw_data/.gitkeep
+
+# Arquivos temporários e de cache
+*.pyc
+__pycache__/
+.ipynb_checkpoints/
+*.log
+*.tmp
+*.swp
+*.bak
+.DS_Store
+
+# Ambientes virtuais
+venv/
+env/
+.conda/
+
+# Modelos treinados e outros artefatos grandes
+models/*
+saved_models/*
+output/*
+reports/*
+
+# Arquivos específicos do sistema operacional
+.vscode/
+
+# Arquivos de distribuição (se aplicável)
+dist/
+build/
+*.egg-info/
+
+# Outros arquivos específicos do projeto que você não quer rastrear
+# exemplo: config.yaml
+# config.local.yaml
+addons/*
