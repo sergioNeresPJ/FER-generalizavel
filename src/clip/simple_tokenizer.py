@@ -1,15 +1,19 @@
+import sys
+import os
+sys.path.append(os.path.expanduser("~/.local/lib/python3.10/site-packages"))
+
 import gzip
 import html
-import os
 from functools import lru_cache
 
 import ftfy
 import regex as re
 
 
+
 @lru_cache()
 def default_bpe():
-    return os.path.join(os.path.dirname(os.path.abspath(__file__)), "bpe_simple_vocab_16e6.txt.gz")
+    return os.path.join('/home/uc1add2a09dc85742dea98fbdba71022/FER-generalizavel/src/clip/bpe_simple_vocab_16e6.txt.gz')
 
 
 @lru_cache()
@@ -63,7 +67,9 @@ class SimpleTokenizer(object):
     def __init__(self, bpe_path: str = default_bpe()):
         self.byte_encoder = bytes_to_unicode()
         self.byte_decoder = {v: k for k, v in self.byte_encoder.items()}
-        merges = gzip.open(bpe_path).read().decode("utf-8").split('\n')
+        with gzip.open(bpe_path, 'rb') as f:
+            merges = f.read().decode("utf-8").split('\n')
+        #merges = open(bpe_path, 'rb').read().decode("utf-8").split('\n')
         merges = merges[1:49152-256-2+1]
         merges = [tuple(merge.split()) for merge in merges]
         vocab = list(bytes_to_unicode().values())
