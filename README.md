@@ -12,7 +12,7 @@ SOTA facial expression recognition (FER) methods fail on test sets that have dom
 
 **Citation**
 
-If you find our code useful, please consider citing autor's paper:
+If you find our code useful, please consider citing original autor's paper:
 
 ```shell
 @inproceedings{zhang2024generalizable,
