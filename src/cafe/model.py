@@ -134,7 +134,7 @@ def Mask(nb_batch):
     bar = torch.from_numpy(bar)
 
     # Verifica se XPU está disponível
-    device = torch.device("xpu" if torch.xpu.is_available() else "cpu")
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     bar = bar.to(device)
     bar = Variable(bar)
     return bar
@@ -225,7 +225,7 @@ class Model(nn.Module):
         super(Model, self).__init__()
 
         res18 = ResNet(block = BasicBlock, n_blocks = [2,2,2,2], channels = [64, 128, 256, 512], output_dim=1000)
-        msceleb_model = torch.load(model_path, map_location=torch.device('cpu'))
+        msceleb_model = torch.load(model_path)
         state_dict = msceleb_model['state_dict']
         res18.load_state_dict(state_dict, strict=False)
 
