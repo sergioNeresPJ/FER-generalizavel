@@ -3,9 +3,9 @@ emotion_to_index_mma = {
             "disgust": 1,
             "fear": 2,
             "happiness": 3,
+            "neutral": 4,
             "sadness": 5,
-            "surprise": 6,
-            "neutral": 4
+            "surprise": 6
         }
 
 index_to_emotion_mma = {v: k for k, v in emotion_to_index_mma.items()}
