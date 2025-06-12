@@ -235,7 +235,7 @@ class Model(nn.Module):
 
         fc_in_dim = list(res18.children())[-1].in_features  # original fc layer's input dimension (512)
         self.fc = nn.Linear(fc_in_dim, num_classes)         # new fc layer 512 -> num_classes
-        #self.gate_layer = nn.Linear(fc_in_dim, fc_in_dim)   # for dynamic gating
+        #sself.gate_layer = nn.Linear(fc_in_dim, fc_in_dim)   # for dynamic gating
 
         self.parm = {}
         for name, parameters in self.fc.named_parameters():
