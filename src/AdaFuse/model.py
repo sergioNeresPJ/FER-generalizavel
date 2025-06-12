@@ -224,7 +224,7 @@ class Model(nn.Module):
     def __init__(self, pretrained=True, num_classes=7, drop_rate=0, model_path=None):
         super(Model, self).__init__()
 
-        res18 = ResNet(block = BasicBlock, n_blocks = [2,2,2,2], channels = [64, 128, 256, 512], output_dim=1000)
+        res18 = ResNet(block=BasicBlock, n_blocks=[2, 2, 2, 2], channels=[64, 128, 256, 512], output_dim=1000)
         msceleb_model = torch.load(model_path)
         state_dict = msceleb_model['state_dict']
         res18.load_state_dict(state_dict, strict=False)
@@ -233,39 +233,38 @@ class Model(nn.Module):
         self.features = nn.Sequential(*list(res18.children())[:-2])
         self.features2 = nn.Sequential(*list(res18.children())[-2:-1])
 
-        fc_in_dim = list(res18.children())[-1].in_features  # original fc layer's in dimention 512
-        self.fc = nn.Linear(fc_in_dim, num_classes)  # new fc layer 512x7
-		self.gate_layer = nn.Linear(fc_in_dim, fc_in_dim)
-        self.parm={}
-        for name,parameters in self.fc.named_parameters():
-            print(name,':',parameters.size())
-            self.parm[name]=parameters
+        fc_in_dim = list(res18.children())[-1].in_features  # original fc layer's input dimension (512)
+        self.fc = nn.Linear(fc_in_dim, num_classes)         # new fc layer 512 -> num_classes
+        self.gate_layer = nn.Linear(fc_in_dim, fc_in_dim)   # for dynamic gating
 
-		
+        self.parm = {}
+        for name, parameters in self.fc.named_parameters():
+            print(name, ':', parameters.size())
+            self.parm[name] = parameters
 
     def forward(self, x, clip_model, targets, phase='train'):
         with torch.no_grad():
             image_features = clip_model.encode_image(x)
 
+        x = self.features(x)
         x = self.features2(x)
-		x = x.view(x.size(0), -1)
-		ecnn = x
-		eclip = image_features
+        x = x.view(x.size(0), -1)
 
-		# Gating: g = sigmoid(W * ecnn + b)
-		g = torch.sigmoid(self.gate_layer(ecnn))
+        ecnn = x
+        eclip = image_features
 
-		# Fusão adaptativa: zfused = eclip * g + ecnn * (1 - g)
-		zfused = eclip * g + ecnn * (1 - g)
+        # Gating: g = sigmoid(W * ecnn + b)
+        g = torch.sigmoid(self.gate_layer(ecnn))
 
-		# Perda supervisionada auxiliar
-		if phase == 'train':
-			MC_loss = supervisor(zfused, targets, cnum=73)
+        # Adaptive fusion: zfused = eclip * g + ecnn * (1 - g)
+        zfused = eclip * g + ecnn * (1 - g)
 
-		# Classificação final
-		out = self.fc(zfused)
+        if phase == 'train':
+            MC_loss = supervisor(zfused, targets, cnum=73)
 
-        if phase=='train':
+        out = self.fc(zfused)
+
+        if phase == 'train':
             return out, MC_loss
         else:
             return out, out
