@@ -235,13 +235,13 @@ class Model(nn.Module):
 
         fc_in_dim = list(res18.children())[-1].in_features  # original fc layer's in dimention 512
         self.fc = nn.Linear(fc_in_dim, num_classes)  # new fc layer 512x7
-
+		self.gate_layer = nn.Linear(fc_in_dim, fc_in_dim)
         self.parm={}
         for name,parameters in self.fc.named_parameters():
             print(name,':',parameters.size())
             self.parm[name]=parameters
 
-		self.gate_layer = nn.Linear(fc_in_dim, fc_in_dim)
+		
 
     def forward(self, x, clip_model, targets, phase='train'):
         with torch.no_grad():
